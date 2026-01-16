@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Ciclo Vacacional Orquestando 2026</title>
+
+<style>
+body {
+  font-family: Arial, sans-serif;
+}
+
+/* CONTENEDOR DEL ENCABEZADO */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+/* LOGOS */
+.logo {
+  height: 80px;
+}
+
+/* TITULOS */
+.titulos {
+  text-align: center;
+  flex: 1;
+}
+
+h1 {
+  font-size: 36px;
+  margin: 0;
+}
+
+h2 {
+  margin: 5px 0 0 0;
+  font-size: 20px;
+}
+
+/* BUSCADOR Y TABLA */
+input {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 10px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th, td {
+  border: 1px solid #ccc;
+  padding: 8px;
+}
+
+th {
+  background: #f2f2f2;
+}
+</style>
+</head>
+
+<body>
+
+<!-- ENCABEZADO CON LOGOS -->
+<div class="header">
+  <img src="logo_izquierdo.png" alt="Logo izquierdo" class="logo">
+
+  <div class="titulos">
+    <h1>CICLO VACACIONAL ORQUESTANDO 2026</h1>
+    <h2>Buscador de Estudiantes</h2>
+  </div>
+
+  <img src="logo_derecho.png" alt="Logo derecho" class="logo">
+</div>
+
+<input type="text" id="buscador" placeholder="Buscar por DNI, nombre o apellido...">
+
+<table>
+  <thead>
+    <tr>
+      <th>DNI</th>
+      <th>Nombres</th>
+      <th>Apellidos</th>
+      <th>Horario</th>
+      <th>Educador Musical</th>
+      <th>Grupo</th>
+      <th>WhatsApp</th>
+    </tr>
+  </thead>
+  <tbody id="tabla"></tbody>
+</table>
+
+<script>
+let estudiantes = [];
+
+fetch("datos.csv")
+  .then(res => res.text())
+  .then(texto => {
+    const lineas = texto.trim().split("\n");
+    const encabezados = lineas[0].split(",");
+
+    for (let i = 1; i < lineas.length; i++) {
+      const valores = lineas[i].split(",");
+      let obj = {};
+      encabezados.forEach((h, j) => obj[h.trim()] = valores[j]?.trim());
+      estudiantes.push(obj);
+    }
+
+    render(estudiantes);
+  });
+
+function render(lista) {
+  const tabla = document.getElementById("tabla");
+  tabla.innerHTML = "";
+
+  lista.forEach(e => {
+    const link = e["Link de Grupo Whatsapp"]
+      ? `<a href="${e["Link de Grupo Whatsapp"]}" target="_blank">Abrir</a>`
+      : "No disponible";
+
+    tabla.innerHTML += `
+      <tr>
+        <td>${e["DNI"]}</td>
+        <td>${e["Nombres del estudiante"]}</td>
+        <td>${e["Apellidos del estudiante"]}</td>
+        <td>${e["HORARIO"]}</td>
+        <td>${e["EDUCADOR MUSICAL"]}</td>
+        <td>${e["GRUPO"]}</td>
+        <td>${link}</td>
+      </tr>`;
+  });
+}
+
+document.getElementById("buscador").addEventListener("input", e => {
+  const t = e.target.value.toLowerCase();
+  render(estudiantes.filter(est =>
+    Object.values(est).join(" ").toLowerCase().includes(t)
+  ));
+});
+</script>
+
+</body>
+</html>
